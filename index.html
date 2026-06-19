@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Veldara</title>
+<title>Esquimal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -40,7 +40,7 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.25rem 2.5rem;
 }
-nav .logo { font-weight: 700; font-size: 1.25rem; color: #fff; letter-spacing: -0.025em; }
+nav .logo img { height: 24px; display: block; filter: brightness(0) invert(1); }
 nav .nav-links { display: flex; align-items: center; gap: 1.5rem; }
 nav .nav-links a { font-size: 0.875rem; color: #d1d5db; text-decoration: none; transition: color 0.2s; }
 nav .nav-links a:hover { color: #fff; }
@@ -75,19 +75,30 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 #hero .ctas {
   display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center;
 }
-#hero .code-box {
-  display: flex; align-items: center; gap: 0.5rem;
-  background: #1a1a1a; border: 1px solid rgba(55,65,81,0.5);
-  border-radius: 0.5rem; padding: 0.875rem 2rem;
-}
-#hero .code-box .prompt { color: #2C5C88; font-family: monospace; font-size: 0.875rem; }
-#hero .code-box code { font-size: 0.875rem; color: #e5e7eb; font-family: monospace; }
-#hero .cta-btn {
+#hero .glass-btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  background: #2C5C88; color: #fff; font-weight: 500; border-radius: 0.5rem;
-  padding: 0.875rem 2rem; font-size: 0.875rem; text-decoration: none; transition: background 0.2s;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px; padding: 0.875rem 2rem;
+  font-size: 0.875rem; color: #fff; text-decoration: none;
+  font-weight: 500; transition: all 0.3s ease;
 }
-#hero .cta-btn:hover { background: #3a7aad; }
+#hero .glass-btn:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+#hero .glass-btn.primary {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(44,92,136,0.4);
+}
+#hero .glass-btn.primary:hover {
+  background: rgba(44,92,136,0.3);
+  border-color: rgba(44,92,136,0.6);
+}
 #hero .bounce-arrow {
   position: relative; z-index: 10; display: flex; justify-content: center; padding-bottom: 2rem;
 }
@@ -159,16 +170,16 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 <div id="fixed-cards">
   <div class="grid">
     <div class="card">
-      <h3>Explore Veldara</h3>
-      <p>Veldara merges the elegance of Svelte 5 with the depth of Three.js within easy reach. It's crafted to be robust and adaptable while remaining intuitive and simple to grasp.</p>
+      <h3>Diseño que transforma tu espacio</h3>
+      <p>El Ventilador de Torre con Difusor de Aroma fusiona una estética minimalista de 132 cm con la tecnología más eficiente del mercado. Está diseñado para integrarse con elegancia en cualquier habitación, ofreciendo un flujo de aire potente y una experiencia de uso extremadamente silenciosa.</p>
     </div>
     <div class="card">
-      <h3>Unlock Three.js</h3>
-      <p>The web is growing increasingly dimensional. At its heart, Veldara offers a composable declarative API for building performant Three.js experiences on the web.</p>
+      <h3>Tecnología enfocada en tu bienestar</h3>
+      <p>Tu ambiente merece estar a tu medida. Este ventilador combina una oscilación de 70° con un difusor de aroma integrado, permitiéndote personalizar no solo la temperatura, sino la atmósfera sensorial de tu hogar para crear momentos de total relajación.</p>
     </div>
     <div class="card">
-      <h3>Connect Everything</h3>
-      <p>Veldara ships with tooling for physics, XR, animation, layouting, model loading, and extensive utilities to make building compelling 3D apps for the web effortless.</p>
+      <h3>Control total al alcance de tu mano</h3>
+      <p>Equipado para hacer tu vida más fácil: control remoto con alcance de 6 metros, panel táctil LED con monitoreo de temperatura en tiempo real y un modo sueño ultra silencioso, programable hasta por 15 horas para que descanses sin interrupciones.</p>
     </div>
   </div>
 </div>
@@ -176,16 +187,16 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 <!-- Navigation -->
 <nav>
   <div style="display:flex;align-items:center;gap:2rem;">
-    <span class="logo">veldara</span>
+    <a href="https://esquimal.mx/" class="logo"><img src="https://esquimal.mx/web/image/website/2/logo/Web%20Esquimal?unique=3d50266" alt="Esquimal" /></a>
     <div class="nav-links">
-      <a href="#">Guides</a>
-      <a href="#">Journal</a>
+      <a href="https://esquimal.mx/">Guías de uso</a>
+      <a href="#">Blog de Estilo</a>
     </div>
   </div>
   <div class="social">
-    <a href="#"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
-    <a href="#"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286z"/></svg></a>
-    <a href="#"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></a>
+    <a href="https://www.instagram.com/esquimalmx/" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+    <a href="https://www.facebook.com/esquimalmx" target="_blank"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+    <a href="https://www.tiktok.com/@esquimalmx" target="_blank"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 0h4.5c1.6 0 3.1.6 4.2 1.7.6.6 1 1.4 1.2 2.3h-3.7c-.2-.6-.6-1.1-1.1-1.4-.5-.3-1.1-.5-1.7-.5H13v10.5c0 .7-.2 1.4-.6 1.9s-.9.9-1.5 1.1c-.6.2-1.2.2-1.8 0-.6-.2-1.1-.6-1.5-1.1-.4-.5-.6-1.2-.6-1.9 0-1.2.6-2.3 1.6-2.9.5-.3 1.1-.5 1.7-.5V0h4.5z"/></svg></a>
   </div>
 </nav>
 
@@ -195,18 +206,14 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   <section id="hero">
     <div class="gradient-overlay"></div>
     <div class="content">
-      <p class="subtitle">Our Purpose:</p>
+      <p class="subtitle">Tu hogar, tu clima ideal</p>
       <h1>
-        Instantly craft immersive
-        <span class="underlined"><span class="line"></span><span>3D worlds</span></span>
-        on the web.
+        Frescura avanzada y aromas envolventes en
+        <span class="underlined"><span class="line"></span><span>un solo dispositivo</span></span>.
       </h1>
       <div class="ctas">
-        <div class="code-box">
-          <span class="prompt">&gt;</span>
-          <code>npm i @veldara/core</code>
-        </div>
-        <a href="#" class="cta-btn">Get Started <span>&rarr;</span></a>
+        <a href="https://esquimal.mx/shop/tf-k4201r-1-ventilador-de-torre-tf-k4201r-1-2850?category=32" class="glass-btn primary" target="_blank">Comprar ahora <span>&rarr;</span></a>
+        <a href="#cards-trigger" class="glass-btn">Ver especificaciones <span>&darr;</span></a>
       </div>
     </div>
     <div class="bounce-arrow">
@@ -226,8 +233,8 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   <!-- Section 3 -->
   <section id="section-three">
     <div class="inner" id="section-three-inner">
-      <p>Presenting</p>
-      <h2>Veldara 8</h2>
+      <p>Calidad Esquimal</p>
+      <h2>Innovación en climatización para tu hogar</h2>
     </div>
   </section>
 </div>
