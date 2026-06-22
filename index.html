@@ -152,10 +152,10 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
 <!-- Scroll Video Background -->
 <div id="scroll-video-container">
-  <canvas id="video-canvas"></canvas>
   <video id="video-fallback" muted autoplay playsinline preload="auto"
     src="./video/video-optimizado-ventilador.mp4"
   ></video>
+  <canvas id="video-canvas"></canvas>
   <div class="overlay"></div>
 </div>
 
@@ -344,7 +344,6 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   videoEl.addEventListener('seeked', () => { videoSeeking = false; });
   videoEl.addEventListener('stalled', () => { videoSeeking = false; });
   videoEl.addEventListener('loadeddata', () => { videoEl.currentTime = 0.01; });
-  canvas.style.visibility = 'hidden';
 
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
