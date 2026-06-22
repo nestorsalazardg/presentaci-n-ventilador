@@ -152,10 +152,11 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
 <!-- Scroll Video Background -->
 <div id="scroll-video-container">
-  <canvas id="video-canvas"></canvas>
-  <video id="video-fallback" muted playsinline preload="auto"
+  <video id="video-native" muted playsinline preload="auto"
+    poster="./video/poster.jpg"
     src="./video/video-optimizado-ventilador.mp4"
   ></video>
+  <canvas id="video-canvas"></canvas>
   <div class="overlay"></div>
 </div>
 
@@ -240,12 +241,15 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   // ===================== SCROLL VIDEO =====================
   const VIDEO_URL = './video/video-optimizado-ventilador.mp4';
   const canvas = document.getElementById('video-canvas');
-  const videoEl = document.getElementById('video-fallback');
+  const videoEl = document.getElementById('video-native');
   const ctx = canvas.getContext('2d');
   let frames = [];
   let framesReady = false;
   let lastFrameIndex = -1;
-  let videoSeeking = false;
+
+  // Detect mobile/touch devices (iOS Safari, Chrome on iPhone, etc.)
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+    (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
 
   function resizeCanvas() {
     const dpr = Math.min(devicePixelRatio, 2);
@@ -259,6 +263,26 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
     lastFrameIndex = -1;
   }
 
+  function getScrollBounds() {
+    const vh = window.innerHeight;
+    return { start: vh * 0.5, end: document.documentElement.scrollHeight - vh };
+  }
+
+  function getProgress() {
+    const { start, end } = getScrollBounds();
+    const range = end - start;
+    if (range <= 0) return 0;
+    return Math.max(0, Math.min(1, (window.scrollY - start) / range));
+  }
+
+  function drawFrame(frame) {
+    const cw = canvas.width, ch = canvas.height;
+    const s = Math.max(cw / frame.width, ch / frame.height);
+    const dw = frame.width * s, dh = frame.height * s;
+    ctx.drawImage(frame, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+  }
+
+  // ---- DESKTOP PATH: extractFrames + canvas ----
   async function extractFrames() {
     try {
       const response = await fetch(VIDEO_URL);
@@ -296,59 +320,105 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
       if (frames.length > 0) {
         framesReady = true;
-        canvas.style.visibility = 'visible';
-        videoEl.style.display = 'none';
+        canvas.style.display = '';
       }
       URL.revokeObjectURL(objectUrl);
-    } catch(e) { /* fallback to video seeking */ }
+    } catch(e) { /* fallback: native video stays visible */ }
   }
 
-  function getScrollBounds() {
-    const vh = window.innerHeight;
-    return { start: vh * 0.5, end: document.documentElement.scrollHeight - vh };
-  }
-
-  function getProgress() {
-    const { start, end } = getScrollBounds();
-    const range = end - start;
-    if (range <= 0) return 0;
-    return Math.max(0, Math.min(1, (window.scrollY - start) / range));
-  }
-
-  function drawFrame(frame) {
-    const cw = canvas.width, ch = canvas.height;
-    const s = Math.max(cw / frame.width, ch / frame.height);
-    const dw = frame.width * s, dh = frame.height * s;
-    ctx.drawImage(frame, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-  }
-
-  function videoTick() {
-    const progress = getProgress();
+  function desktopTick() {
     if (framesReady && frames.length > 0) {
+      const progress = getProgress();
       const idx = Math.round(progress * (frames.length - 1));
       if (idx !== lastFrameIndex) {
         lastFrameIndex = idx;
         if (frames[idx]) drawFrame(frames[idx]);
       }
-    } else if (videoEl.duration && isFinite(videoEl.duration) && videoEl.readyState >= 1) {
-      const target = progress * videoEl.duration;
-      if (!videoSeeking && Math.abs(videoEl.currentTime - target) > 0.001) {
-        videoSeeking = true;
-        videoEl.currentTime = target;
-      }
     }
-    requestAnimationFrame(videoTick);
+    requestAnimationFrame(desktopTick);
   }
 
-  videoEl.addEventListener('seeked', () => { videoSeeking = false; });
-  videoEl.addEventListener('stalled', () => { videoSeeking = false; });
-  videoEl.addEventListener('loadeddata', () => { videoEl.currentTime = 0.01; });
-  canvas.style.visibility = 'hidden';
+  // ---- MOBILE PATH: native <video> with scroll-controlled currentTime ----
+  let mobileVideoReady = false;
+  let mobileSeeking = false;
+  let lastSeekTime = 0;
 
+  function unlockVideoiOS() {
+    // iOS requires a user gesture to "unlock" video playback.
+    // We play briefly then pause to unlock the decoder.
+    const playPromise = videoEl.play();
+    if (playPromise) {
+      playPromise.then(() => {
+        videoEl.pause();
+        videoEl.currentTime = 0.01;
+        mobileVideoReady = true;
+      }).catch(() => {
+        // Still blocked — will retry on next touch/scroll
+      });
+    }
+  }
+
+  function mobileTick() {
+    if (!mobileVideoReady) {
+      requestAnimationFrame(mobileTick);
+      return;
+    }
+
+    const progress = getProgress();
+    const duration = videoEl.duration;
+
+    if (duration && isFinite(duration) && videoEl.readyState >= 2) {
+      const targetTime = progress * (duration - 0.1);
+      const now = performance.now();
+
+      // Throttle seeks: only seek if enough time has passed and delta is significant
+      if (!mobileSeeking && Math.abs(videoEl.currentTime - targetTime) > 0.05 && (now - lastSeekTime) > 80) {
+        mobileSeeking = true;
+        lastSeekTime = now;
+        videoEl.currentTime = targetTime;
+      }
+    }
+
+    requestAnimationFrame(mobileTick);
+  }
+
+  // ---- INIT ----
+  canvas.style.display = 'none';
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  requestAnimationFrame(videoTick);
-  extractFrames();
+
+  if (isMobile) {
+    // MOBILE: poster is visible immediately via poster attribute.
+    // We need to unlock the video for iOS, then do scroll-based seeking.
+    videoEl.load(); // Force iOS to start loading
+
+    // Try to unlock on first user interaction
+    const unlockEvents = ['touchstart', 'scroll', 'click'];
+    function onFirstInteraction() {
+      unlockVideoiOS();
+      unlockEvents.forEach(e => window.removeEventListener(e, onFirstInteraction));
+    }
+    unlockEvents.forEach(e => window.addEventListener(e, onFirstInteraction, { once: false, passive: true }));
+
+    // Also try unlocking when video has enough data
+    videoEl.addEventListener('canplay', () => {
+      if (!mobileVideoReady) unlockVideoiOS();
+    });
+
+    videoEl.addEventListener('seeked', () => { mobileSeeking = false; });
+    videoEl.addEventListener('stalled', () => { mobileSeeking = false; });
+    videoEl.addEventListener('waiting', () => { mobileSeeking = false; });
+
+    requestAnimationFrame(mobileTick);
+  } else {
+    // DESKTOP: use extractFrames + canvas, native video as placeholder
+    videoEl.autoplay = true;
+    videoEl.loop = true;
+    videoEl.play().catch(() => {});
+
+    requestAnimationFrame(desktopTick);
+    extractFrames();
+  }
 
   // ===================== PARTICLES =====================
   const pCanvas = document.getElementById('particles-canvas');
