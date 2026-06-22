@@ -158,11 +158,11 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
 <!-- Scroll Video Background -->
 <div id="scroll-video-container">
+  <canvas id="video-canvas"></canvas>
   <video id="video-native" muted playsinline preload="auto"
     poster="./video/poster.jpg"
     src="./video/video-optimizado-ventilador.mp4"
   ></video>
-  <canvas id="video-canvas"></canvas>
   <div class="overlay"></div>
 </div>
 
@@ -290,7 +290,9 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
     ctx.drawImage(frame, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }
 
-  // ---- DESKTOP PATH: extractFrames + canvas ----
+  // ---- DESKTOP PATH: extractFrames + canvas (restored from 554664e) ----
+  let videoSeeking = false;
+
   async function extractFrames() {
     try {
       const response = await fetch(VIDEO_URL);
@@ -328,37 +330,30 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
       if (frames.length > 0) {
         framesReady = true;
-        canvas.style.display = '';
+        canvas.style.visibility = 'visible';
+        videoEl.style.display = 'none';
       }
       URL.revokeObjectURL(objectUrl);
-    } catch(e) { /* fallback: native video stays visible */ }
+    } catch(e) { /* fallback to video seeking */ }
   }
 
-  let desktopFallback = false;
-  let desktopSeeking = false;
-
-  function desktopTick() {
+  function videoTick() {
     const progress = getProgress();
-
     if (framesReady && frames.length > 0) {
-      // Canvas scroll-sync (primary)
       const idx = Math.round(progress * (frames.length - 1));
       if (idx !== lastFrameIndex) {
         lastFrameIndex = idx;
         if (frames[idx]) drawFrame(frames[idx]);
       }
-    } else if (desktopFallback && videoEl.duration && isFinite(videoEl.duration) && videoEl.readyState >= 2) {
-      // Fallback: native video seeking
-      const targetTime = progress * (videoEl.duration - 0.1);
-      if (!desktopSeeking && Math.abs(videoEl.currentTime - targetTime) > 0.05) {
-        desktopSeeking = true;
-        videoEl.currentTime = targetTime;
+    } else if (videoEl.duration && isFinite(videoEl.duration) && videoEl.readyState >= 1) {
+      const target = progress * videoEl.duration;
+      if (!videoSeeking && Math.abs(videoEl.currentTime - target) > 0.001) {
+        videoSeeking = true;
+        videoEl.currentTime = target;
       }
     }
-    requestAnimationFrame(desktopTick);
+    requestAnimationFrame(videoTick);
   }
-
-  videoEl.addEventListener('seeked', () => { desktopSeeking = false; });
 
   // ---- MOBILE PATH: native <video> with scroll-controlled currentTime ----
   let mobileVideoReady = false;
@@ -405,13 +400,13 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   }
 
   // ---- INIT ----
-  canvas.style.display = 'none';
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
   if (isMobile) {
     // MOBILE: use lighter 720p video, poster visible immediately.
     // We need to unlock the video for iOS, then do scroll-based seeking.
+    canvas.style.display = 'none';
     videoEl.src = VIDEO_URL_MOBILE;
     videoEl.load(); // Force iOS to start loading
 
@@ -434,15 +429,14 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
     requestAnimationFrame(mobileTick);
   } else {
-    // DESKTOP: poster visible immediately, extractFrames in background.
-    // If extractFrames fails, fallback to native video seeking.
-    requestAnimationFrame(desktopTick);
-    extractFrames().then(() => {
-      if (!framesReady) {
-        // extractFrames failed silently — fallback to native video seeking
-        desktopFallback = true;
-      }
-    });
+    // DESKTOP: exact logic from 554664e that was working
+    canvas.style.visibility = 'hidden';
+    videoEl.addEventListener('seeked', () => { videoSeeking = false; });
+    videoEl.addEventListener('stalled', () => { videoSeeking = false; });
+    videoEl.addEventListener('loadeddata', () => { videoEl.currentTime = 0.01; });
+
+    requestAnimationFrame(videoTick);
+    extractFrames();
   }
 
   // ===================== PARTICLES =====================
