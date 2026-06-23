@@ -150,11 +150,15 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   #hero h1 { font-size: 1.5rem; }
   #hero .ctas { flex-direction: column; }
   #hero .glass-btn { width: 100%; }
+  #fixed-cards .carousel-track {
+    overflow: hidden;
+    width: 100%;
+  }
   #fixed-cards .grid {
     display: flex;
-    overflow: hidden;
     flex-wrap: nowrap;
     gap: 0;
+    width: auto;
   }
   #fixed-cards .card {
     flex: 0 0 100%;
@@ -206,18 +210,20 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
 
 <!-- Fixed Cards -->
 <div id="fixed-cards">
-  <div class="grid">
-    <div class="card">
-      <h3>Diseño que transforma tu espacio</h3>
-      <p>El Ventilador de Torre con Difusor de Aroma fusiona una estética minimalista de 132 cm con la tecnología más eficiente del mercado. Está diseñado para integrarse con elegancia en cualquier habitación, ofreciendo un flujo de aire potente y una experiencia de uso extremadamente silenciosa.</p>
-    </div>
-    <div class="card">
-      <h3>Tecnología enfocada en tu bienestar</h3>
-      <p>Tu ambiente merece estar a tu medida. Este ventilador combina una oscilación de 70° con un difusor de aroma integrado, permitiéndote personalizar no solo la temperatura, sino la atmósfera sensorial de tu hogar para crear momentos de total relajación.</p>
-    </div>
-    <div class="card">
-      <h3>Control total al alcance de tu mano</h3>
-      <p>Equipado para hacer tu vida más fácil: control remoto con alcance de 6 metros, panel táctil LED con monitoreo de temperatura en tiempo real y un modo sueño ultra silencioso, programable hasta por 15 horas para que descanses sin interrupciones.</p>
+  <div class="carousel-track">
+    <div class="grid">
+      <div class="card">
+        <h3>Diseño que transforma tu espacio</h3>
+        <p>El Ventilador de Torre con Difusor de Aroma fusiona una estética minimalista de 132 cm con la tecnología más eficiente del mercado. Está diseñado para integrarse con elegancia en cualquier habitación, ofreciendo un flujo de aire potente y una experiencia de uso extremadamente silenciosa.</p>
+      </div>
+      <div class="card">
+        <h3>Tecnología enfocada en tu bienestar</h3>
+        <p>Tu ambiente merece estar a tu medida. Este ventilador combina una oscilación de 70° con un difusor de aroma integrado, permitiéndote personalizar no solo la temperatura, sino la atmósfera sensorial de tu hogar para crear momentos de total relajación.</p>
+      </div>
+      <div class="card">
+        <h3>Control total al alcance de tu mano</h3>
+        <p>Equipado para hacer tu vida más fácil: control remoto con alcance de 6 metros, panel táctil LED con monitoreo de temperatura en tiempo real y un modo sueño ultra silencioso, programable hasta por 15 horas para que descanses sin interrupciones.</p>
+      </div>
     </div>
   </div>
   <div class="card-dots"></div>
