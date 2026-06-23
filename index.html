@@ -151,17 +151,37 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   #hero .ctas { flex-direction: column; }
   #hero .glass-btn { width: 100%; }
   #fixed-cards .grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    display: flex;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    gap: 0;
   }
   #fixed-cards .card {
-    grid-column: 1;
-    grid-row: 1;
-    opacity: 0;
+    flex: 0 0 100%;
+    min-width: 100%;
+    opacity: 1;
+    position: relative;
   }
   #fixed-cards { padding: 1.5rem 1rem; }
+  #fixed-cards .card-dots { display: flex; }
   #section-three { padding-bottom: 5rem; }
+}
+
+#fixed-cards .card-dots {
+  display: none;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1rem;
+}
+#fixed-cards .card-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transition: background 0.3s ease;
+}
+#fixed-cards .card-dots .dot.active {
+  background: #fff;
 }
 
 @media (min-width: 769px) {
@@ -200,6 +220,7 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
       <p>Equipado para hacer tu vida más fácil: control remoto con alcance de 6 metros, panel táctil LED con monitoreo de temperatura en tiempo real y un modo sueño ultra silencioso, programable hasta por 15 horas para que descanses sin interrupciones.</p>
     </div>
   </div>
+  <div class="card-dots"></div>
 </div>
 
 <!-- Navigation -->
@@ -510,6 +531,16 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
   // ===================== FIXED CARDS =====================
   const fixedCards = document.getElementById('fixed-cards');
   const cardsGrid = fixedCards.querySelector('.grid');
+  const cardDots = fixedCards.querySelector('.card-dots');
+
+  // Build dot indicators
+  const cardCount = fixedCards.querySelectorAll('.card').length;
+  for (let i = 0; i < cardCount; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    cardDots.appendChild(dot);
+  }
+  const dots = cardDots.querySelectorAll('.dot');
 
   function tickCards() {
     const trigger = document.getElementById('cards-trigger');
@@ -537,35 +568,29 @@ nav .social svg { width: 1.25rem; height: 1.25rem; }
     const isMobile = window.innerWidth < 768;
 
     if (isMobile) {
-      // Mobile: cards appear one by one with cross-fade
-      const cards = fixedCards.querySelectorAll('.card');
-      const len = cards.length;
-      const crossFade = (1 / len) * 0.2;
+      // Mobile: sliding carousel — cards slide horizontally, one at a time
+      const len = cardCount;
+      const p0 = 0, p1 = 0.25, p2 = 0.40, p3 = 0.60, p4 = 0.75, p5 = 1;
+      const c0 = 0, c1 = 0, c2 = 1, c3 = 1, c4 = 2, c5 = 2;
 
-      cards.forEach((card, i) => {
-        const centerLow = i / len;
-        const centerHigh = (i + 1) / len;
+      let cardPos;
+      if (progress <= p1) {
+        cardPos = c0 + (progress - p0) / (p1 - p0) * (c1 - c0);
+      } else if (progress <= p2) {
+        cardPos = c1 + (progress - p1) / (p2 - p1) * (c2 - c1);
+      } else if (progress <= p3) {
+        cardPos = c2 + (progress - p2) / (p3 - p2) * (c3 - c2);
+      } else if (progress <= p4) {
+        cardPos = c3 + (progress - p3) / (p4 - p3) * (c4 - c3);
+      } else {
+        cardPos = c4 + (progress - p4) / (p5 - p4) * (c5 - c4);
+      }
 
-        const fadeInStart = i === 0 ? 0 : Math.max(centerLow - crossFade, 0);
-        const fadeInEnd = centerLow + crossFade;
-        const fadeOutStart = centerHigh - crossFade;
-        const fadeOutEnd = i === len - 1 ? 1 : Math.min(centerHigh + crossFade, 1);
+      cardsGrid.style.transform = `translateX(${-(cardPos) * 100}%)`;
 
-        let opacity;
-        if (progress <= fadeInStart || progress >= fadeOutEnd) {
-          opacity = 0;
-        } else if (progress < fadeInEnd) {
-          opacity = (progress - fadeInStart) / (fadeInEnd - fadeInStart);
-        } else if (progress < fadeOutStart) {
-          opacity = 1;
-        } else {
-          opacity = 1 - (progress - fadeOutStart) / (fadeOutEnd - fadeOutStart);
-        }
-
-        opacity = Math.max(0, Math.min(1, opacity));
-        card.style.opacity = opacity;
-        card.style.transform = `translateY(${(1 - opacity) * 16}px)`;
-      });
+      // Update dot indicators
+      const activeDot = Math.min(len - 1, Math.round(cardPos));
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === activeDot));
     } else {
       // Desktop: reveal cards horizontally with mask (unchanged)
       const revealPct = progress * 130;
